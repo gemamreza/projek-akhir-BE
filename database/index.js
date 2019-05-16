@@ -2,9 +2,9 @@ const mysql = require('mysql')
  
 const db = mysql.createConnection({
     host : 'localhost',
-    user: 'jamal' ,
-    password : 'jamaludin' ,
-    database : 'authentication_test' ,
+    user: 'root' ,
+    password : 'gemaster12345' ,
+    database : 'lokalmarket_ta' ,
     port : 3306 ,
 })
 

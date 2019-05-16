@@ -1,0 +1,31 @@
+const router = require('express').Router()
+const {productController, cartController, transactionController} = require('./../controler')
+const upload = require('./../helper/uploader/uploader')
+
+router.post('/addproduct', upload.single('image'), productController.addProduct)
+router.put('/editproduct/:id', upload.single('edit'), productController.editProduct)
+router.delete('/delete/:id', productController.delete)
+router.get('/allproduct', productController.getAll)
+router.get('/productlist/:id', productController.getProductByCat)
+router.get('/category', productController.getCategory)
+router.delete('/deletecat/:id', productController.deleteCategory)
+router.get('/productdetail/:id', productController.getProductDetail)
+router.post('/addcategory', productController.addCategory)
+router.put('/editcat/:id', productController.editCategory)
+// =========CART
+router.post('/addcart', cartController.addToCart)
+router.get('/getcart', cartController.getCart)
+router.put('/editcart/:id', cartController.editCart )
+router.delete('/deletecart/:id', cartController.deleteCart)
+router.get('/getcount', cartController.countCart)
+router.post('/checkout', cartController.checkOut)
+router.get('/showhistory', cartController.showHistory)
+// =========TRANSAKSI
+router.get('/transaction', transactionController.getAllTransactionByAdmin )
+router.get('/history', transactionController.getHistory)
+router.get('/historydetail/:id_order', transactionController.getHistoryByDetail)
+router.put('/updatestatus/:id', transactionController.updateStatus)
+router.put('/cancelstatus/:id', transactionController.updateCancelStatus)
+router.put('/payment/:id', upload.single('transaction'), transactionController.uploadTransaction)
+module.exports = router
+

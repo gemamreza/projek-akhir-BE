@@ -1,7 +1,6 @@
 {
   "name": "nodemailer-encrypt-express",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,7 +11,20 @@
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "express": "^4.16.4",
+    "format-currency": "^1.0.0",
+    "handlebars": "^4.1.2",
+    "html-pdf": "^2.2.0",
     "mysql": "github:mysqljs/mysql",
     "nodemailer": "^6.0.0"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamesfikrii/auth-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jamesfikrii/auth-api/issues"
+  },
+  "homepage": "https://github.com/jamesfikrii/auth-api#readme",
+  "description": ""
 }
