@@ -14,7 +14,7 @@ module.exports = {
                        where username = '${data.username}';`
             db.query(sql , (err,result) => {
                 try{
-                if(err) throw {error:true , msg : 'Error in database'}
+                if(err) throw {error:true , msg : 'Error from database'}
                 if(result.length > 0) throw {error : true, msg : 'Username has been taken'}
                 var hashPassword = Crypto.createHmac('sha256','secretabc')
                                    .update(data.password).digest('hex')
@@ -25,7 +25,7 @@ module.exports = {
                     var mailOptions = verify(data.username,data.password,data.email)
                         transporter.sendMail(mailOptions, (err,res1) => {
                             if(err) throw {error : true , msg : 'Error saat pengiriman email'}
-                            res.send('Register Succes, please check your email to verify')                            
+                            res.send('Register Success, please check your email to verify')                            
                         })
                 })
                 }catch(err){
@@ -40,8 +40,7 @@ module.exports = {
         var sql = `update users set verified = 'true' where username='${username}'
                    and password = '${password}';`
                 db.query(sql, (err, result) => {
-                    if(err) throw (err)
-                    console.log(result)
+                    if(err) throw err
                     res.send('Email Berhasil di Verifikasi')
                 })
         
@@ -49,26 +48,6 @@ module.exports = {
     login : (req, res) => {
         var username = req.query.username
         var password = req.query.password
-        // var hashPassword = Crypto.createHmac('sha256','secretabc')
-        //                    .update(password).digest('hex')
-        // var sql = `select verified from users where username= '${username}'
-        //            and password='${hashPassword}';`
-        //            db.query(sql, (err, result) => {
-        //                 if(err) throw err
-        //                 if(result == false){
-        //                     res.send('Username atau Password tidak cocok!')
-        //                 } else {
-        //                     if(result[0].verified == 'false'){
-        //                         res.send('Please verify your account')
-        //                     } else {
-        //                         var sql = `select * from users where username = '${username}';`
-        //                         db.query(sql, (err, result) => {
-        //                             if(err) throw (err)
-        //                             res.send(result)
-        //                         })
-        //                     }
-        //                 }
-        //            })
         var passwordHash = Crypto.createHmac('sha256','secretabc').update(password).digest('hex')
         var sql = `select * from users where username='${username}' and password='${passwordHash}';`
         db.query(sql , (err,result)=>{
@@ -89,6 +68,5 @@ module.exports = {
             if(err) throw err
             res.send(result)
         })
-        
     }
 }

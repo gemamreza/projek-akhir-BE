@@ -13,11 +13,10 @@ module.exports = {
                     try{
                         if(result.length > 0) {
                             var quantity= result[0].qty+data.qty
-
                             var sql2=`update cart set qty=${quantity} where username='${data.username}' and id_produk=${data.id_produk}`
                             db.query(sql2, (err1, result1) => {
                                 if(err1) throw err1
-                                res.send('Berhasil Edit QTY')
+                                res.send('Berhasil Edit Quantity')
                             })
                         } else {
                             var sql3 = `insert into cart set ?`
@@ -34,7 +33,7 @@ module.exports = {
         getCart : (req, res) => {
             var username = req.query.username
             var sql = `select cart.id, cart.id_produk, cart.username, p.nama, p.harga, p.diskon, qty from cart
-                        join products as p on id_produk = p.id where cart.username='${username}'; `
+                       left join products as p on id_produk = p.id where cart.username='${username}'; `
             db.query(sql, (err, result) => {
                 if(err) throw err
                 res.send(result)
@@ -73,7 +72,7 @@ module.exports = {
             var monthName = ['January','February','March','April','May','June','July','August','September', 'October', 'Desember']
             var tanggal = day + ' ' + monthName[month] + ' ' + year + ' ' + date.getHours() + ' : ' + date.getMinutes() + ' : ' + date.getSeconds()
             var data = req.body
-            data.status = 'NOT YET PAID'
+            data.status = 'UNPAID YET'
             var newData = {
                 ...data,
                 tanggal
@@ -82,9 +81,8 @@ module.exports = {
             db.query(sql, newData, (err, result) => {
                 try{
                 if(err) throw err
-                console.log(result)
                 var sqla = `select cart.id, id_produk, username, p.nama, p.harga, p.diskon, qty from cart
-                            join products p on id_produk = p.id where username='${newData.username}';`
+                            left join products p on id_produk = p.id where username='${newData.username}';`
                 db.query(sqla, (err1, result1) => {
                     if(err1) throw err1
                     var sqlb = `select id from history where username='${newData.username}' and tanggal='${newData.tanggal}';`
@@ -98,6 +96,7 @@ module.exports = {
                         var sqlc = `insert into historydetail (id_order, id_produk, qty, total) values ${newArray.join(',')};`
                         db.query(sqlc, (err3, result3) => {
                             if(err3) throw err3
+                            // res.send('Check Out Berhasil, Silakan Cek Email Anda.')
                             var idArray = []
                             result1.map((val) => {
                                 idArray.push(val.id)
@@ -105,7 +104,7 @@ module.exports = {
                             var sqld = `delete from cart where id in (${idArray.join(',')})`
                             db.query(sqld, (err4, result4) => {
                                 if(err4) throw err4
-                                var sqle = `select email from users where username = '${data.username}';`
+                                var sqle = `select email from users where username = '${newData.username}';`
                                 db.query(sqle, (err5, result5) => {
                                     if(err5) throw err5
                                     var id = result2[0].id
@@ -113,7 +112,6 @@ module.exports = {
                                     db.query(sqlf, (err6, result6) => {
                                         if(err6) throw err6
                                         var idorder = result2[0].id
-                                        console.log(idorder)
                                         var totalharga = result6[0].total
                                         var email = result5[0].email
                                         var sqlg = `select h.id, p.nama, p.harga, h.tanggal, p.diskon, qty, hd.total from historydetail as hd
@@ -121,7 +119,6 @@ module.exports = {
                                                     join history h on id_order = h.id where id_order=${idorder};`
                                         db.query(sqlg, (err7, result7) => {
                                             if(err7) throw err7
-                                            console.log(result7)
                                             fs.readFile('./pdf/invoice.html' , {encoding : 'utf-8'}, (err8, pdfResult) => {
                                                 if(err8) throw err8
                                                 var invoice = hbars.compile(pdfResult)
@@ -155,13 +152,15 @@ module.exports = {
                                                 }
                                                 pdf.create(hasilHbars, options).toStream((err9, hasilStream) => {
                                                     if(err9) throw err9
+        
                                                     var optionsNod = {
                                                         from : 'gadgetmarket <www.gadget-market.com>',
                                                         to : email,
                                                         subject : 'Invoice Pembayaran',
                                                         html : `<h1>Ini adalah invoice untuk anda,
-                                                                silakan klik link ini untuk pergi ke halaman Konfirmasi Pembayaran
-                                                                Total belanja Anda adalah Rp. ${Currency(totalharga)} </h1>`,
+                                                                silakan klik <a href='http://localhost:3000/payment/${id}'> link ini </a> untuk pergi ke halaman Konfirmasi Pembayaran
+                                                                Total belanja Anda adalah Rp. ${(Currency(totalharga))}.</h1>
+                                                                <h1>Silakan transfer ke Bank Maybank dengan no rek : 1235-7666-249 atas nama Gadgetmarket.</h1>`,
                                                         attachments : [
                                                             {
                                                                 filename : 'invoice.pdf',
@@ -176,20 +175,6 @@ module.exports = {
                                                 })
                                             })
                                         })
-                                    //     var total = result6[0].total
-                                    //     var email = result5[0].email
-                                    //     var mail = {
-                                    //         from : 'gadgetmarket <gadgetmarket@gmail.com>',
-                                    //         to : email,
-                                    //         subject : 'INVOICE PEMBAYARAN',
-                                    //         html : `<h1>Terimakasih Sudah Berbelanja di Toko Kami</h1>
-                                                    
-                                    //                 <p>Berikut total harga yang harus di transfer adalah Rp. ${Currency(total)} </p>`
-                                    //     }
-                                    //     transporter.sendMail(mail, (err7, result7) => {
-                                    //         if(err7) throw err7
-                                    //         res.send('Check Out Berhasil, Silakan Cek Email Anda.')
-                                    //     })
                                     })
                                 })
                             })

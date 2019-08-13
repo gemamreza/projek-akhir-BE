@@ -1,4 +1,4 @@
-var multer  = require('multer')
+var multer = require('multer')
 
 const storageConfig = multer.diskStorage({
     // FILE MAU DISIMPAN DIMANA
@@ -15,7 +15,7 @@ const filterConfig = (req, file, cb) => {
     if(file.mimetype.split('/')[1] === 'png' || file.mimetype.split('/')[1] === 'jpeg'){
         cb(null, true)
     }else{
-        req.validation = {error : true , msg : 'File must be image'}
+        req.validation = {error : true , msg : 'File must be an image!'}
         cb(null, false)
     }
 }

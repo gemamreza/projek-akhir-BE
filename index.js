@@ -12,6 +12,7 @@ app.use('/uploads',express.static('uploads'))
 app.use('/user' , userRouter)
 app.use('/product', productRouter)
 
+
 app.get('/' , (req,res) => {
     res.send('<h1> Selamat Datang di Tugas Akhir</h1>')
 })
